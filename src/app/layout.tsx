@@ -8,7 +8,7 @@ import Providers from './_providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Taskify',
+  title: 'Task Manager',
   description: 'Task management app'
 };
 

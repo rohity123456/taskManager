@@ -35,14 +35,14 @@ This is a task list management application built with Next.js, Prisma, and Mongo
 - **Authentication:** NextAuth.js 
 
 ## Demo
-- Live : [Task Manager](#)
+- Live : [Task Manager](https://task-manager-d8mh.vercel.app/)
   
 ## Getting Started locally
 
 1. **Clone the Repository:**
    ```bash
-   git clone [invalid URL removed]
-   cd collaborative-task-list
+   git clone https://github.com/rohity123456/taskManager.git
+   cd taskManager
    ```
 
 2. **Install Dependencies:**
@@ -54,7 +54,6 @@ This is a task list management application built with Next.js, Prisma, and Mongo
    ```bash
    <!-- Add these lines to .env -->
       DATABASE_URL=<your-mongodb-url>
-      NEXTAUTH_SECRET="<your-secret-key>"
    ```
 
 3. **Prisma setting:**
