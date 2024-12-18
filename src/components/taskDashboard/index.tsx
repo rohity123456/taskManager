@@ -5,7 +5,7 @@ import { TaskTable } from './components/taskTable';
 import Loading from '../ui/loading';
 import TaskControls from './components/taskControls';
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { SimpleAlert } from '../common/SimpleAlert';
 
 export default function TasksDashboard() {
@@ -27,32 +27,34 @@ export default function TasksDashboard() {
   const count = data?.count || 0;
 
   return (
-    <div className='container'>
-      <div className='flex justify-between items-center'>
-        <h1>Task Dashboard</h1>
-        <TaskControls />
-      </div>
-      {isLoading ? (
-        <div>
-          <Loading />
+    <Suspense>
+      <div className='container'>
+        <div className='flex justify-between items-center'>
+          <h1>Task Dashboard</h1>
+          <TaskControls />
         </div>
-      ) : isError ? (
-        <div className='mt-2 flex items-center justify-center'>
-          <SimpleAlert
-            title='Error'
-            description='Failed to fetch tasks'
-            variant={'destructive'}
-            className='md:w-1/2'
+        {isLoading ? (
+          <div>
+            <Loading />
+          </div>
+        ) : isError ? (
+          <div className='mt-2 flex items-center justify-center'>
+            <SimpleAlert
+              title='Error'
+              description='Failed to fetch tasks'
+              variant={'destructive'}
+              className='md:w-1/2'
+            />
+          </div>
+        ) : (
+          <TaskTable
+            tasks={tasks || []}
+            taskCount={count}
+            page={pageParam}
+            itemsPerPage={itemsPerPage}
           />
-        </div>
-      ) : (
-        <TaskTable
-          tasks={tasks || []}
-          taskCount={count}
-          page={pageParam}
-          itemsPerPage={itemsPerPage}
-        />
-      )}
-    </div>
+        )}
+      </div>
+    </Suspense>
   );
 }

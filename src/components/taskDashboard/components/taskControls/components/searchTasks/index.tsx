@@ -1,6 +1,6 @@
 'use client';
 import { Input } from '@/components/ui/input';
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export function Search() {
@@ -39,14 +39,16 @@ export function Search() {
   }, [query, currentQuery, handleSearch]);
 
   return (
-    <form onSubmit={handleSearch} className='flex items-center space-x-2'>
-      <Input
-        type='text'
-        placeholder='Search by name, description, status, priority...'
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        className='w-full md:w-[300px] dark:bg-zinc-800 outline-none border-2 dark:border-stone-100'
-      />
-    </form>
+    <Suspense>
+      <form onSubmit={handleSearch} className='flex items-center space-x-2'>
+        <Input
+          type='text'
+          placeholder='Search by name, description, status, priority...'
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className='w-full md:w-[300px] dark:bg-zinc-800 outline-none border-2 dark:border-stone-100'
+        />
+      </form>
+    </Suspense>
   );
 }

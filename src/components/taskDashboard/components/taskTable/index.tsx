@@ -20,6 +20,7 @@ import Link from 'next/link';
 import { useTaskActions } from '@/app/hooks/useTaskActions';
 import { TaskRow } from './components/taskRow';
 import { ITask } from '@/types/task';
+import { Suspense } from 'react';
 
 interface TaskTableProps {
   tasks: ITask[];
@@ -89,56 +90,58 @@ export function TaskTable({
   };
 
   return (
-    <div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Modified At</TableHead>
-            <TableHead>Task</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Priority</TableHead>
-            <TableHead>Due Date</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tasks.map((task) => (
-            <TaskRow
-              key={task.id}
-              task={task}
-              onDelete={deleteTask}
-              onUpdate={updateTask}
-            />
-          ))}
-        </TableBody>
-      </Table>
+    <Suspense>
+      <div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Modified At</TableHead>
+              <TableHead>Task</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Priority</TableHead>
+              <TableHead>Due Date</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tasks.map((task) => (
+              <TaskRow
+                key={task.id}
+                task={task}
+                onDelete={deleteTask}
+                onUpdate={updateTask}
+              />
+            ))}
+          </TableBody>
+        </Table>
 
-      <Pagination className='mt-4'>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              className={page === 1 ? 'cursor-not-allowed' : 'cursor-pointer'}
-              onClick={() => handlePageChange(page - 1)}
-            >
-              Previous
-            </PaginationPrevious>
-          </PaginationItem>
-          {createPageLinks()}
-          <PaginationItem>
-            <PaginationNext
-              onClick={() => handlePageChange(page + 1)}
-              className={
-                page === totalPages
-                  ? 'cursor-not-allowed bg-gray'
-                  : 'cursor-pointer'
-              }
-            >
-              Next
-            </PaginationNext>
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-    </div>
+        <Pagination className='mt-4'>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                className={page === 1 ? 'cursor-not-allowed' : 'cursor-pointer'}
+                onClick={() => handlePageChange(page - 1)}
+              >
+                Previous
+              </PaginationPrevious>
+            </PaginationItem>
+            {createPageLinks()}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => handlePageChange(page + 1)}
+                className={
+                  page === totalPages
+                    ? 'cursor-not-allowed bg-gray'
+                    : 'cursor-pointer'
+                }
+              >
+                Next
+              </PaginationNext>
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
+    </Suspense>
   );
 }
