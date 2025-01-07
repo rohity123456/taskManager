@@ -8,6 +8,7 @@ export async function GET(request: Request) {
   const pageSize = 10;
   const skip = (page - 1) * pageSize;
   const query = searchParams.get('q') || '';
+  console.log('Search Params:', searchParams);
 
   try {
     const tasks = await prisma.task.findMany({
@@ -21,7 +22,10 @@ export async function GET(request: Request) {
       },
       skip,
       take: pageSize,
-      orderBy: { updatedAt: 'desc' },
+      orderBy: {
+        [searchParams.get('sortBy') || 'createdAt']:
+          searchParams.get('sortOrder') || 'asc'
+      },
       select: {
         id: true,
         name: true,

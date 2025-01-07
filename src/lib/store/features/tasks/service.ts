@@ -9,6 +9,8 @@ type TaskQuery = {
   page: string;
   pageSize: string;
   q?: string;
+  sortBy?: string;
+  sortOrder?: string;
 };
 export const taskApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

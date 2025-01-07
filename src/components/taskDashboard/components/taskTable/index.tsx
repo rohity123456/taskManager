@@ -15,12 +15,24 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTaskActions } from '@/app/hooks/useTaskActions';
 import { TaskRow } from './components/taskRow';
 import { ITask } from '@/types/task';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
+import { MoveDown, MoveUp } from 'lucide-react';
 
 interface TaskTableProps {
   tasks: ITask[];
@@ -37,6 +49,10 @@ export function TaskTable({
 }: TaskTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortKey, setSortKey] = useState('');
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   const totalPages = Math.ceil(taskCount / itemsPerPage);
 
@@ -48,6 +64,18 @@ export function TaskTable({
     }
     const params = new URLSearchParams(searchParams);
     params.set('page', String(newPage));
+    router.push(`/?${params}`);
+  };
+
+  const handleSorting = (key: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('sortBy', String(key));
+    const newSortOrder =
+      sortKey === key && sortOrder === 'asc' ? 'desc' : 'asc';
+    setSortOrder(newSortOrder);
+    setSortKey(key);
+    params.set('sortOrder', newSortOrder);
+    params.set('sortBy', key);
     router.push(`/?${params}`);
   };
 
@@ -89,18 +117,83 @@ export function TaskTable({
     return pageLinks;
   };
 
+  const handleTaskDelete = async () => {
+    deleteTask(taskToDelete as string);
+    setIsDeleteAlertOpen(false);
+  };
+
   return (
     <Suspense>
       <div>
         <Table>
-          <TableHeader>
+          <TableHeader className='cursor-pointer'>
             <TableRow>
-              <TableHead>Modified At</TableHead>
-              <TableHead>Task</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>Due Date</TableHead>
+              <TableHead onClick={() => handleSorting('updatedAt')}>
+                <div className='flex items-center'>
+                  <span>Modified At</span>
+                  {sortKey === 'updatedAt' && sortOrder === 'asc' && (
+                    <MoveDown size={15} fontWeight={800} />
+                  )}
+                  {sortKey === 'updatedAt' && sortOrder === 'desc' && (
+                    <MoveUp size={15} fontWeight={800} />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead onClick={() => handleSorting('name')}>
+                <div className='flex items-center'>
+                  <span>Task Name</span>
+                  {sortKey === 'name' && sortOrder === 'asc' && (
+                    <MoveDown size={15} fontWeight={800} />
+                  )}
+                  {sortKey === 'name' && sortOrder === 'desc' && (
+                    <MoveUp size={15} fontWeight={800} />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead onClick={() => handleSorting('description')}>
+                <div className='flex items-center'>
+                  <span>Description</span>
+                  {sortKey === 'description' && sortOrder === 'asc' && (
+                    <MoveDown size={15} fontWeight={800} />
+                  )}
+                  {sortKey === 'description' && sortOrder === 'desc' && (
+                    <MoveUp size={15} fontWeight={800} />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead onClick={() => handleSorting('status')}>
+                <div className='flex items-center'>
+                  <span>Status</span>
+                  {sortKey === 'status' && sortOrder === 'asc' && (
+                    <MoveDown size={15} fontWeight={800} />
+                  )}
+                  {sortKey === 'status' && sortOrder === 'desc' && (
+                    <MoveUp size={15} fontWeight={800} />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead onClick={() => handleSorting('priority')}>
+                <div className='flex items-center'>
+                  <span>Priority</span>
+                  {sortKey === 'priority' && sortOrder === 'asc' && (
+                    <MoveDown size={15} fontWeight={800} />
+                  )}
+                  {sortKey === 'priority' && sortOrder === 'desc' && (
+                    <MoveUp size={15} fontWeight={800} />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead onClick={() => handleSorting('dueDate')}>
+                <div className='flex items-center'>
+                  <span>Due Date</span>
+                  {sortKey === 'dueDate' && sortOrder === 'asc' && (
+                    <MoveDown size={15} fontWeight={800} />
+                  )}
+                  {sortKey === 'dueDate' && sortOrder === 'desc' && (
+                    <MoveUp size={15} fontWeight={800} />
+                  )}
+                </div>
+              </TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -109,7 +202,10 @@ export function TaskTable({
               <TaskRow
                 key={task.id}
                 task={task}
-                onDelete={deleteTask}
+                onDelete={(taskId) => {
+                  setTaskToDelete(taskId);
+                  setIsDeleteAlertOpen(true);
+                }}
                 onUpdate={updateTask}
               />
             ))}
@@ -142,6 +238,25 @@ export function TaskTable({
           </PaginationContent>
         </Pagination>
       </div>
+      <AlertDialog open={isDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your
+              task, please be certain.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteAlertOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleTaskDelete}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Suspense>
   );
 }

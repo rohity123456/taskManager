@@ -11,17 +11,21 @@ import { SimpleAlert } from '../common/SimpleAlert';
 export default function TasksDashboard() {
   const searchParams = useSearchParams();
   const pageParam = Number(searchParams.get('page') || 1);
+  const sortBy = searchParams.get('sortBy') || '';
+  const sortOrder = searchParams.get('sortOrder') || 'asc';
   const query = searchParams.get('q') || '';
   const itemsPerPage = 10;
   const { data, isLoading, isError, refetch } = useGetTasksQuery({
     page: `${pageParam}`,
     pageSize: `${itemsPerPage}`,
-    q: `${query}`
+    q: `${query}`,
+    sortBy: `${sortBy}`,
+    sortOrder: `${sortOrder}`
   });
 
   useEffect(() => {
     refetch();
-  }, [pageParam, query, refetch]);
+  }, [pageParam, query, sortBy, sortOrder, refetch]);
 
   const tasks = data?.tasks || [];
   const count = data?.count || 0;
